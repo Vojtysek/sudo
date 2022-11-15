@@ -126,7 +126,7 @@ const Home: NextPage = () => {
   }
 
   solveSudoku();
-  removeKDigits(0);
+  removeKDigits(40);
 
   return (
     <main className="flex flex-col items-center">
