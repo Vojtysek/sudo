@@ -74,10 +74,17 @@ const Home: NextPage = () => {
     if (isEmpty) {
       return true;
     }
-    for (let num = 1; num <= n; num++) {
-      if (checkSpec(row, col, num)) {
-        array[row][col] = num;
-        filledArray[row][col] = num;
+    //start from random number 1-9 and dont repeat
+
+    let nums = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+    for (let i = nums.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [nums[i], nums[j]] = [nums[j], nums[i]];
+    }
+    for (let i = 0; i < nums.length; i++) {
+      if (checkSpec(row, col, nums[i])) {
+        array[row][col] = nums[i];
+        filledArray[row][col] = nums[i];
         if (solveSudoku()) {
           return true;
         } else {
@@ -106,7 +113,6 @@ const Home: NextPage = () => {
   };
 
   const compare = (arr1: any[][], arr2: any[][]) => {
-    //Compare and return the umatched values
     let unmatched = [];
     for (let i = 0; i < n; i++) {
       for (let j = 0; j < n; j++) {
@@ -119,37 +125,45 @@ const Home: NextPage = () => {
   };
 
   const setWin = () => {
-    document.getElementById("overlay")!.style.display = "flex"
-    document.getElementById("overlay")!.style.flexDirection = "column"
-    document.getElementById("overlay")!.style.alignItems = "center"
-    document.getElementById("overlay")!.style.justifyContent = "center"
-  }
+    document.getElementById("overlay")!.style.display = "flex";
+    document.getElementById("overlay")!.style.flexDirection = "column";
+    document.getElementById("overlay")!.style.alignItems = "center";
+    document.getElementById("overlay")!.style.justifyContent = "center";
+  };
 
   solveSudoku();
   removeKDigits(40);
 
   return (
     <main className="flex flex-col items-center">
-      <div id="overlay" className="absolute z-10 hidden w-full h-full">
+      <div id="overlay" className="absolute z-10 hidden h-full w-full">
         <div className="flex flex-col items-center text-3xl">
-        <p>You Have</p> 
-        <span className="text-green-500 text-8xl">WON</span>
-        <button className="absolute bottom-12 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-4" onClick={() => window.location.reload()}>Play Again</button>
+          <p>You Have</p>
+          <span className="text-8xl text-green-500">WON</span>
+          <button
+            className="absolute bottom-12 mt-4 rounded bg-green-500 py-2 px-4 font-bold text-white hover:bg-green-700"
+            onClick={() => window.location.reload()}
+          >
+            Play Again
+          </button>
         </div>
       </div>
       <h1 className=" mt-10 text-4xl font-bold">
         Welcome to <span className=" text-green-400">Sudoku</span>!
       </h1>
       <div className="mt-10 text-xl">
-        {/* Render sudoku array and if the col is " " add input */}
         {array.map((row, i) => (
           <div className="flex flex-row">
-            {/* If won show You Won text */}
             {row.map((col, j) => (
-              <div className="flex h-8 w-8 items-center justify-center border sm:h-16 sm:w-16">
+              <div
+                //add green-400 border at bottom of first and second 3rd row and right of first and 3rd col and add white border to all
+                className={`border ${
+                  i % 3 === 2 && i !== 8 ? "border-b-8 border-b-green-400 " : ""
+                } ${j % 3 === 2 && j !== 8 ? "border-r-8 border-r-green-400 " : ""}`}
+              >
                 {col === " " ? (
                   <input
-                    className="h-10 w-10 text-center"
+                    className="h-14 w-14 text-center"
                     maxLength={1}
                     type="text"
                     onChange={(e) => {
@@ -165,7 +179,7 @@ const Home: NextPage = () => {
                     }}
                   />
                 ) : (
-                  col
+                  <p className="h-14 w-14 text-center flex flex-col justify-center items-center">{col}</p>
                 )}
               </div>
             ))}
@@ -173,12 +187,13 @@ const Home: NextPage = () => {
         ))}
       </div>
       <button
-        className="mt-10 text-xl rounded-md bg-green-400 p-2 text-white"
+        className="mt-4 rounded bg-green-500 py-2 px-4 font-bold text-white hover:bg-green-700"
         onClick={() => {
-          compare(array, filledArray).length === 0
-          // flex col and items center  and justify center
-            ? setWin()
-            : alert("You have not won yet!");
+          if (compare(array, filledArray).length === 0) {
+            setWin();
+          } else {
+            alert("You have not completed the sudoku");
+          }
         }}
       >
         Check
